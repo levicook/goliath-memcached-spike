@@ -13,10 +13,12 @@ class Api < Goliath::API
 
   private
 
+  def connection_pool
+    config['memcached-connection-pool'].execute(false) { |c| yield c }
+  end
+
   def fetch(key, ttl=nil, options=nil, &block)
-    config['memcached-connection-pool'].execute(false) do |connection|
-      connection.fetch(key, ttl, options, &block)
-    end
+    connection_pool { |c| c.fetch(key, ttl, options, &block) }
   end
 
 end
